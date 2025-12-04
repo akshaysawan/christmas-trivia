@@ -23,7 +23,7 @@
             --bg-color: #2F5233;
             --card-bg: rgba(255, 255, 255, 0.95);
             --header-font: 'Mountains of Christmas', cursive;
-            --bg-pattern: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-2.21 0-4-1.79-4-4 0-3.314-2.686-6-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6zM32 22c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            --bg-pattern: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-2.21 0-4-1.79-4-4 0-3.314-2.686-6-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6zM32 22c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
         [data-theme="newyear"] {
@@ -106,7 +106,7 @@
         }
 
         .top-controls {
-            position: absolute;
+            position: fixed; /* Changed to fixed to ensure visibility on all screens */
             top: 20px;
             right: 20px;
             z-index: 1000;
@@ -265,9 +265,25 @@
                     <!-- ERROR MESSAGE -->
                     <div id="error-message" class="alert alert-danger d-none-custom" role="alert"></div>
 
+                    <!-- SCREEN 0: WELCOME -->
+                    <div id="welcome-screen" class="text-center py-4">
+                        <div class="mb-4">
+                             <!-- Using a larger version of theme icon dynamically in JS, but static placeholder here -->
+                             <i class="fas fa-glass-cheers fa-3x" style="color: var(--accent-color); opacity: 0.5"></i>
+                        </div>
+                        <h1 class="display-4 mb-4" style="font-family: var(--header-font); color: var(--primary-color);">Welcome to the Party!</h1>
+                        <p class="lead mb-5 text-muted">Grab a drink, find a team, and get ready for some trivia.</p>
+                        
+                        <div class="d-grid gap-3 col-md-6 mx-auto">
+                            <button class="btn btn-lg btn-custom btn-next py-3" onclick="enterSetup()">
+                                <i class="fas fa-play me-2"></i> Let's Play!
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- SCREEN 1: UPLOAD -->
-                    <div id="setup-screen" class="text-center">
-                        <h3 class="mb-4" style="color: var(--secondary-color)">Let's Get This Party Started!</h3>
+                    <div id="setup-screen" class="text-center d-none-custom">
+                        <h3 class="mb-4" style="color: var(--secondary-color)">Upload Questions</h3>
                         <p class="text-muted mb-4">Upload your CSV file to begin. <br>Format: Column 1 = Question, Column 2 = Answer.</p>
                         
                         <div class="upload-area mb-4" id="drop-zone">
@@ -360,6 +376,7 @@
     
     // --- DOM Elements ---
     const screens = {
+        welcome: document.getElementById('welcome-screen'),
         setup: document.getElementById('setup-screen'),
         game: document.getElementById('game-screen'),
         end: document.getElementById('end-screen')
@@ -421,6 +438,20 @@
 
     // --- Logic ---
 
+    // NEW FUNCTION: Handle entering the setup from welcome screen
+    function enterSetup() {
+        // Only try to auto-start music if it isn't ALREADY playing
+        if (themes[currentTheme].music && ui.audio.paused) {
+            ui.audio.play().then(() => {
+                isMusicPlaying = true;
+                updateMusicBtnUI();
+            }).catch(e => {
+                console.log("Audio play failed (file might be missing or user interaction needed):", e);
+            });
+        }
+        switchScreen('setup');
+    }
+
     function changeTheme(themeName) {
         currentTheme = themeName;
         document.body.setAttribute('data-theme', themeName);
@@ -448,10 +479,10 @@
         if (t.music) {
             ui.musicBtn.classList.remove('d-none-custom');
             ui.audio.src = t.music;
-            // Note: Browsers block auto-play. It will only play if user has interacted or clicks the toggle.
+            // Only auto-play if we are already in the "playing" state
             if (isMusicPlaying) {
                 ui.audio.play().catch(e => {
-                    console.log("Autoplay blocked, waiting for interaction");
+                    console.log("Autoplay blocked/waiting for interaction");
                     isMusicPlaying = false;
                     updateMusicBtnUI();
                 });
@@ -631,7 +662,7 @@
     function resetGame() {
         ui.fileInput.value = '';
         questions = [];
-        switchScreen('setup');
+        switchScreen('welcome'); // Go back to welcome screen on reset
     }
 
     function switchScreen(screenName) {
@@ -708,6 +739,9 @@
         ui.musicBtn.classList.remove('d-none-custom');
         updateMusicBtnUI();
     }
+    
+    // START ON WELCOME SCREEN
+    switchScreen('welcome');
     startSnow(); 
 </script>
 
