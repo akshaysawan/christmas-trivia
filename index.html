@@ -93,7 +93,6 @@
             transition: all 0.5s ease;
         }
 
-        /* Generic Decorative Border */
         .decorative-header::after {
             content: '';
             position: absolute;
@@ -106,7 +105,7 @@
         }
 
         .top-controls {
-            position: fixed; /* Changed to fixed to ensure visibility on all screens */
+            position: fixed;
             top: 20px;
             right: 20px;
             z-index: 1000;
@@ -118,7 +117,7 @@
         .upload-area {
             border: 3px dashed var(--secondary-color);
             border-radius: 10px;
-            padding: 40px;
+            padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
@@ -221,6 +220,69 @@
             pointer-events: none;
         }
 
+        /* Scoreboard Styles */
+        .scoreboard {
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid var(--accent-color);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .team-badge {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .team-badge .score {
+            font-size: 1.2rem;
+            color: #000;
+        }
+
+        .scoring-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .scoring-controls.visible {
+            opacity: 1;
+        }
+
+        .leaderboard-item {
+            background: rgba(255,255,255,0.8);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .leaderboard-item.winner {
+            background: var(--accent-color);
+            color: var(--secondary-color);
+            font-weight: bold;
+            transform: scale(1.1);
+            border: 3px solid var(--primary-color);
+        }
+
         @keyframes fall {
             to { transform: translateY(105vh); }
         }
@@ -230,13 +292,10 @@
 </head>
 <body data-theme="christmas">
 
-<!-- Audio Element -->
 <audio id="bg-music" loop>
     <source src="" type="audio/ogg">
-    Your browser does not support the audio element.
 </audio>
 
-<!-- Theme Switcher & Music Toggle -->
 <div class="top-controls">
     <button class="btn btn-sm btn-light shadow-sm d-none-custom" id="music-btn" onclick="toggleMusic()">
         <i class="fas fa-music"></i>
@@ -251,7 +310,7 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
+        <div class="col-lg-10">
             
             <div class="main-card">
                 <div class="decorative-header">
@@ -262,56 +321,72 @@
 
                 <div class="card-body p-4 p-md-5">
                     
-                    <!-- ERROR MESSAGE -->
                     <div id="error-message" class="alert alert-danger d-none-custom" role="alert"></div>
 
-                    <!-- SCREEN 0: WELCOME -->
+                    <!-- WELCOME -->
                     <div id="welcome-screen" class="text-center py-4">
                         <div class="mb-4">
-                             <!-- Using a larger version of theme icon dynamically in JS, but static placeholder here -->
                              <i class="fas fa-glass-cheers fa-3x" style="color: var(--accent-color); opacity: 0.5"></i>
                         </div>
                         <h1 class="display-4 mb-4" style="font-family: var(--header-font); color: var(--primary-color);">Welcome to the Party!</h1>
-                        <p class="lead mb-5 text-muted">Grab a snack, find a team, and get ready for some trivia.</p>
+                        <p class="lead mb-5 text-muted">Grab a drink, find a team, and get ready for some trivia.</p>
                         
                         <div class="d-grid gap-3 col-md-6 mx-auto">
                             <button class="btn btn-lg btn-custom btn-next py-3" onclick="enterSetup()">
                                 <i class="fas fa-play me-2"></i> Let's Play!
                             </button>
                         </div>
+                        <div class="mt-3">
+                             <small class="text-muted" id="restore-msg"></small>
+                        </div>
                     </div>
 
-                    <!-- SCREEN 1: UPLOAD -->
+                    <!-- SETUP -->
                     <div id="setup-screen" class="text-center d-none-custom">
-                        <h3 class="mb-4" style="color: var(--secondary-color)">Upload Questions</h3>
-                        <p class="text-muted mb-4">Upload your CSV file to begin. <br>Format: Column 1 = Question, Column 2 = Answer.</p>
+                        <h3 class="mb-4" style="color: var(--secondary-color)">Game Setup</h3>
                         
-                        <div class="upload-area mb-4" id="drop-zone">
-                            <i class="fas fa-file-csv fa-4x mb-3" style="color: var(--secondary-color)"></i>
-                            <h5>Click to Upload CSV</h5>
-                            <p class="text-muted small">or drag and drop file here</p>
-                            <input type="file" id="csvFile" accept=".csv" class="d-none">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="upload-area h-100" id="drop-zone-q">
+                                    <i class="fas fa-question-circle fa-2x mb-2" style="color: var(--secondary-color)"></i>
+                                    <h6>1. Upload Questions (CSV)</h6>
+                                    <small class="text-muted d-block mb-2">Col 1: Question, Col 2: Answer</small>
+                                    <span id="q-file-label" class="badge bg-secondary">No file chosen</span>
+                                    <input type="file" id="csvFile" accept=".csv" class="d-none">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="upload-area h-100" id="drop-zone-t">
+                                    <i class="fas fa-users fa-2x mb-2" style="color: var(--secondary-color)"></i>
+                                    <h6>2. Upload Teams (CSV)</h6>
+                                    <small class="text-muted d-block mb-2">Col 1: Team Name, Col 2: Players</small>
+                                    <span id="t-file-label" class="badge bg-secondary">No file chosen (Optional)</span>
+                                    <input type="file" id="teamFile" accept=".csv" class="d-none">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-check d-inline-block mb-4">
-                            <input class="form-check-input" type="checkbox" value="" id="skipHeader">
-                            <label class="form-check-label" for="skipHeader">
-                                First row is a header (skip it)
-                            </label>
+                        <div class="form-check d-inline-block my-4">
+                            <input class="form-check-input" type="checkbox" checked id="skipHeader">
+                            <label class="form-check-label" for="skipHeader">Skip first row (Headers)</label>
                         </div>
 
-                        <div class="mb-3">
-                            <span class="badge bg-success"><i class="fas fa-random me-1"></i> Auto-Shuffle Enabled</span>
+                        <div class="mt-2">
+                             <button class="btn btn-lg btn-custom btn-next" onclick="processAllFiles()">Start Game</button>
                         </div>
 
                         <div class="mt-3">
-                            <small class="text-muted d-block">Need a template?</small>
-                            <button class="btn btn-sm btn-outline-secondary mt-1" onclick="downloadTemplate()">Download Sample CSV</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="downloadTemplates()">Download Templates</button>
                         </div>
                     </div>
 
-                    <!-- SCREEN 2: GAME -->
+                    <!-- GAME -->
                     <div id="game-screen" class="d-none-custom text-center">
+                        <!-- Scoreboard Area -->
+                        <div id="scoreboard-container" class="scoreboard d-none-custom">
+                            <!-- Teams injected here -->
+                        </div>
+
                         <div class="d-flex justify-content-between text-muted mb-2">
                             <span id="question-counter">Question 1 of 10</span>
                             <span id="score-display">Use arrow keys to navigate</span>
@@ -321,38 +396,39 @@
                             <div class="progress-fill" id="progress-bar"></div>
                         </div>
 
-                        <div class="question-text" id="question-display">
-                            Loading Question...
-                        </div>
+                        <div class="question-text" id="question-display">Loading...</div>
 
                         <div class="answer-box hidden" id="answer-display" onclick="toggleAnswer()">
-                            The Answer will appear here
+                            Answer
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-5">
-                            <button class="btn btn-custom btn-prev" onclick="prevQuestion()">
-                                <i class="fas fa-arrow-left me-2"></i> Prev
-                            </button>
-                            
-                            <button class="btn btn-outline-warning btn-custom" onclick="toggleAnswer()">
-                                <i class="fas fa-eye me-2"></i> Show/Hide Answer
-                            </button>
+                        <!-- Scoring Buttons appear here -->
+                        <div id="scoring-area" class="scoring-controls">
+                            <span class="text-muted w-100 mb-2">Who got it right?</span>
+                            <!-- Buttons injected here -->
+                        </div>
 
-                            <button class="btn btn-custom btn-next" onclick="nextQuestion()">
-                                Next <i class="fas fa-arrow-right ms-2"></i>
-                            </button>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <button class="btn btn-custom btn-prev" onclick="prevQuestion()"><i class="fas fa-arrow-left"></i></button>
+                            <button class="btn btn-outline-warning btn-custom" onclick="toggleAnswer()"><i class="fas fa-eye"></i> Show</button>
+                            <button class="btn btn-custom btn-next" onclick="nextQuestion()">Next <i class="fas fa-arrow-right"></i></button>
                         </div>
                     </div>
 
-                    <!-- SCREEN 3: END -->
-                    <div id="end-screen" class="d-none-custom text-center py-5">
-                        <i id="end-icon" class="fas fa-sleigh fa-5x mb-4" style="color: var(--primary-color)"></i>
-                        <h2 class="display-4 mb-3" style="font-family: var(--header-font);">That's a Wrap!</h2>
-                        <p class="lead mb-5">Hope you had a wonderful time.</p>
+                    <!-- END -->
+                    <div id="end-screen" class="d-none-custom text-center py-4">
+                        <i id="end-icon" class="fas fa-trophy fa-4x mb-3" style="color: var(--accent-color)"></i>
+                        <h2 class="display-4 mb-3" style="font-family: var(--header-font);">Final Scores!</h2>
                         
-                        <button class="btn btn-custom btn-next" onclick="resetGame()">
-                            <i class="fas fa-redo me-2"></i> Play Again
-                        </button>
+                        <div id="final-leaderboard" class="text-start mx-auto" style="max-width: 500px;">
+                            <!-- Leaderboard injected here -->
+                        </div>
+                        
+                        <div class="mt-5">
+                            <button class="btn btn-custom btn-next" onclick="resetGame()">
+                                <i class="fas fa-redo me-2"></i> New Game
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -362,19 +438,21 @@
     </div>
 </div>
 
-<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
 <script>
-    // --- State Management ---
+    // --- State ---
     let questions = [];
+    let teams = []; // { name: "Team A", players: "John, Doe", score: 0 }
     let currentQuestionIndex = 0;
     let currentTheme = 'christmas';
     let snowInterval;
     let isMusicPlaying = false;
     
-    // --- DOM Elements ---
+    const STORAGE_KEY = 'trivia_game_state';
+
+    // --- DOM ---
     const screens = {
         welcome: document.getElementById('welcome-screen'),
         setup: document.getElementById('setup-screen'),
@@ -387,8 +465,8 @@
         answer: document.getElementById('answer-display'),
         counter: document.getElementById('question-counter'),
         progress: document.getElementById('progress-bar'),
-        fileInput: document.getElementById('csvFile'),
-        dropZone: document.getElementById('drop-zone'),
+        csvFile: document.getElementById('csvFile'),
+        teamFile: document.getElementById('teamFile'),
         skipHeader: document.getElementById('skipHeader'),
         error: document.getElementById('error-message'),
         themeIcon1: document.getElementById('theme-icon'),
@@ -396,218 +474,128 @@
         endIcon: document.getElementById('end-icon'),
         themeTitle: document.getElementById('theme-title'),
         audio: document.getElementById('bg-music'),
-        musicBtn: document.getElementById('music-btn')
+        musicBtn: document.getElementById('music-btn'),
+        qLabel: document.getElementById('q-file-label'),
+        tLabel: document.getElementById('t-file-label'),
+        scoreboard: document.getElementById('scoreboard-container'),
+        scoringArea: document.getElementById('scoring-area'),
+        leaderboard: document.getElementById('final-leaderboard'),
+        restoreMsg: document.getElementById('restore-msg')
     };
 
-    // --- Theme Configurations ---
+    // --- Themes ---
     const themes = {
-        christmas: {
-            colors: ['#D42426', '#2F5233', '#F1D570'],
-            icon: 'fa-holly-berry',
-            icon2: 'fa-gift',
-            endIcon: 'fa-sleigh',
-            snow: true,
-            // Local file
-            music: 'bgmusic-christmas.mp3' 
-        },
-        newyear: {
-            colors: ['#FFD700', '#C0C0C0', '#000000'],
-            icon: 'fa-glass-cheers',
-            icon2: 'fa-star',
-            endIcon: 'fa-glass-cheers',
-            snow: false,
-            music: null
-        },
-        diwali: {
-            colors: ['#E65100', '#FFD600', '#4A148C'],
-            icon: 'fa-fire', // Diya substitute
-            icon2: 'fa-om',
-            endIcon: 'fa-fire-alt',
-            snow: false,
-            music: null
-        },
-        holi: {
-            colors: ['#E91E63', '#00BCD4', '#FFEB3B', '#4CAF50'],
-            icon: 'fa-palette',
-            icon2: 'fa-hand-sparkles',
-            endIcon: 'fa-smile-beam',
-            snow: false,
-            music: null
-        }
+        christmas: { colors: ['#D42426', '#2F5233', '#F1D570'], icon: 'fa-holly-berry', icon2: 'fa-gift', endIcon: 'fa-sleigh', snow: true, music: 'bgmusic.mp3' },
+        newyear: { colors: ['#FFD700', '#C0C0C0', '#000000'], icon: 'fa-glass-cheers', icon2: 'fa-star', endIcon: 'fa-glass-cheers', snow: false, music: null },
+        diwali: { colors: ['#E65100', '#FFD600', '#4A148C'], icon: 'fa-fire', icon2: 'fa-om', endIcon: 'fa-fire-alt', snow: false, music: null },
+        holi: { colors: ['#E91E63', '#00BCD4', '#FFEB3B', '#4CAF50'], icon: 'fa-palette', icon2: 'fa-hand-sparkles', endIcon: 'fa-smile-beam', snow: false, music: null }
     };
 
     // --- Logic ---
 
-    // NEW FUNCTION: Handle entering the setup from welcome screen
-    function enterSetup() {
-        // Only try to auto-start music if it isn't ALREADY playing
-        if (themes[currentTheme].music && ui.audio.paused) {
-            ui.audio.play().then(() => {
-                isMusicPlaying = true;
-                updateMusicBtnUI();
-            }).catch(e => {
-                console.log("Audio play failed (file might be missing or user interaction needed):", e);
-            });
+    function init() {
+        // Check for saved state
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            ui.restoreMsg.innerHTML = '<button class="btn btn-sm btn-link" onclick="restoreGame()">Resume previous game?</button>';
         }
+        changeTheme('christmas');
+        switchScreen('welcome');
+        startSnow();
+    }
+
+    function enterSetup() {
+        playMusicSafe();
         switchScreen('setup');
     }
 
-    function changeTheme(themeName) {
-        currentTheme = themeName;
-        document.body.setAttribute('data-theme', themeName);
-        
-        const t = themes[themeName];
-        
-        // Update Icons
-        ui.themeIcon1.className = `fas ${t.icon} me-2`;
-        ui.themeIcon2.className = `fas ${t.icon2} ms-2`;
-        ui.endIcon.className = `fas ${t.endIcon} fa-5x mb-4`;
-
-        // Update Title
-        ui.themeTitle.textContent = themeName === 'diwali' ? 'Diwali Trivia' : 
-                                    themeName === 'holi' ? 'Holi Trivia' : 
-                                    themeName === 'newyear' ? 'New Year Trivia' : 'Holiday Trivia';
-
-        // Manage Snow Effect
-        if (t.snow) {
-            startSnow();
-        } else {
-            stopSnow();
-        }
-
-        // Manage Music
-        if (t.music) {
-            ui.musicBtn.classList.remove('d-none-custom');
-            ui.audio.src = t.music;
-            // Only auto-play if we are already in the "playing" state
-            if (isMusicPlaying) {
-                ui.audio.play().catch(e => {
-                    console.log("Autoplay blocked/waiting for interaction");
-                    isMusicPlaying = false;
-                    updateMusicBtnUI();
-                });
-            }
-        } else {
-            ui.musicBtn.classList.add('d-none-custom');
-            ui.audio.pause();
+    function playMusicSafe() {
+        if (themes[currentTheme].music && ui.audio.paused) {
+            ui.audio.play().then(() => { isMusicPlaying = true; updateMusicBtnUI(); })
+            .catch(e => console.log("Audio waiting for interaction"));
         }
     }
 
-    function toggleMusic() {
-        if (ui.audio.paused) {
-            ui.audio.play().then(() => {
-                isMusicPlaying = true;
-                updateMusicBtnUI();
-            }).catch(e => console.error("Audio error:", e));
-        } else {
-            ui.audio.pause();
-            isMusicPlaying = false;
-            updateMusicBtnUI();
-        }
-    }
+    // --- File Handling ---
 
-    function updateMusicBtnUI() {
-        if (isMusicPlaying) {
-            ui.musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-            ui.musicBtn.classList.remove('btn-light');
-            ui.musicBtn.classList.add('btn-success');
-        } else {
-            ui.musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-            ui.musicBtn.classList.add('btn-light');
-            ui.musicBtn.classList.remove('btn-success');
-        }
-    }
+    // Click triggers
+    document.getElementById('drop-zone-q').onclick = () => ui.csvFile.click();
+    document.getElementById('drop-zone-t').onclick = () => ui.teamFile.click();
 
-    // --- Standard Game Functions ---
+    // File selection listeners
+    ui.csvFile.onchange = (e) => ui.qLabel.textContent = e.target.files[0]?.name || "No file chosen";
+    ui.teamFile.onchange = (e) => ui.tLabel.textContent = e.target.files[0]?.name || "No file chosen";
 
-    ui.dropZone.addEventListener('click', () => ui.fileInput.click());
-    
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        ui.dropZone.addEventListener(eventName, preventDefaults, false);
-    });
+    function processAllFiles() {
+        const qFile = ui.csvFile.files[0];
+        const tFile = ui.teamFile.files[0];
 
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        ui.dropZone.addEventListener(eventName, () => {
-            ui.dropZone.style.backgroundColor = "rgba(255,255,255, 0.8)";
-            ui.dropZone.style.borderColor = "var(--primary-color)";
-        }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        ui.dropZone.addEventListener(eventName, () => {
-            ui.dropZone.style.backgroundColor = "";
-            ui.dropZone.style.borderColor = "";
-        }, false);
-    });
-
-    ui.dropZone.addEventListener('drop', handleDrop, false);
-    ui.fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]), false);
-
-    document.addEventListener('keydown', (e) => {
-        if (screens.game.classList.contains('d-none-custom')) return;
-
-        if (e.key === "ArrowRight" || e.key === " ") {
-            if(ui.answer.classList.contains('hidden')) {
-                toggleAnswer();
-            } else {
-                nextQuestion();
-            }
-        } else if (e.key === "ArrowLeft") {
-            prevQuestion();
-        } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-            toggleAnswer();
-        }
-    });
-
-    function handleDrop(e) {
-        let dt = e.dataTransfer;
-        let files = dt.files;
-        handleFile(files[0]);
-    }
-
-    function handleFile(file) {
-        if (!file) return;
-        ui.error.classList.add('d-none-custom');
-        if (file.type && !file.type.includes('csv') && !file.name.endsWith('.csv')) {
-            showError("Please upload a valid CSV file.");
+        if (!qFile) {
+            showError("Please upload the Questions CSV at minimum.");
             return;
         }
-        Papa.parse(file, {
-            complete: function(results) { processData(results.data); },
-            error: function(err) { showError("Error parsing CSV: " + err.message); }
+
+        // Parse Questions first
+        Papa.parse(qFile, {
+            complete: (resQ) => {
+                const qData = processCSV(resQ.data);
+                if (!qData) return;
+                
+                questions = shuffleArray(qData.map(r => ({q: r[0], a: r[1]})));
+
+                // If Teams file exists, parse it
+                if (tFile) {
+                    Papa.parse(tFile, {
+                        complete: (resT) => {
+                            const tData = processCSV(resT.data);
+                            teams = tData.map(r => ({ name: r[0], players: r[1] || "", score: 0 }));
+                            startGame();
+                        }
+                    });
+                } else {
+                    teams = []; // No scoring mode
+                    startGame();
+                }
+            },
+            error: (err) => showError("Error: " + err.message)
         });
     }
 
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    function processData(data) {
-        let cleanData = data.filter(row => row.length >= 2 && row[0] !== "" && row[0] !== null);
-        if (ui.skipHeader.checked) cleanData.shift();
-
-        if (cleanData.length === 0) {
-            showError("No questions found! Check your CSV format.");
-            return;
-        }
-
-        let rawQuestions = cleanData.map(row => { return { q: row[0], a: row[1] }; });
-        questions = shuffleArray(rawQuestions);
-        startGame();
+    function processCSV(data) {
+        let clean = data.filter(row => row.length >= 1 && row[0]);
+        if (ui.skipHeader.checked) clean.shift();
+        if (clean.length === 0) { showError("Empty CSV found."); return null; }
+        return clean;
     }
 
     function startGame() {
         currentQuestionIndex = 0;
+        saveState();
+        renderGame();
+    }
+
+    function restoreGame() {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved) {
+            questions = saved.questions;
+            teams = saved.teams;
+            currentQuestionIndex = saved.index;
+            renderGame();
+            playMusicSafe();
+        }
+    }
+
+    function renderGame() {
         switchScreen('game');
+        
+        // Setup Scoreboard if teams exist
+        if (teams.length > 0) {
+            ui.scoreboard.classList.remove('d-none-custom');
+            updateScoreboardUI();
+        } else {
+            ui.scoreboard.classList.add('d-none-custom');
+        }
+
         renderQuestion();
     }
 
@@ -617,133 +605,257 @@
             return;
         }
         const q = questions[currentQuestionIndex];
+        
         ui.question.style.opacity = 0;
         setTimeout(() => {
             ui.question.textContent = q.q;
             ui.answer.textContent = q.a;
             ui.answer.classList.add('hidden');
+            ui.scoringArea.classList.remove('visible'); // Hide scoring buttons
+            
+            // Clear scoring area
+            ui.scoringArea.innerHTML = ''; 
+
             ui.counter.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-            const percentage = ((currentQuestionIndex + 1) / questions.length) * 100;
-            ui.progress.style.width = `${percentage}%`;
+            ui.progress.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
             ui.question.style.opacity = 1;
         }, 200);
     }
 
     function toggleAnswer() {
-        if (ui.answer.classList.contains('hidden')) {
+        const isHidden = ui.answer.classList.contains('hidden');
+        if (isHidden) {
             ui.answer.classList.remove('hidden');
             fireConfetti();
+            
+            // Show scoring buttons if teams exist
+            if (teams.length > 0) {
+                renderScoringButtons();
+            }
         } else {
             ui.answer.classList.add('hidden');
+            ui.scoringArea.classList.remove('visible');
         }
+    }
+
+    function renderScoringButtons() {
+        ui.scoringArea.innerHTML = '<span class="text-muted w-100 mb-2">Who got it right?</span>';
+        teams.forEach((team, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-success m-1';
+            btn.innerHTML = `<i class="fas fa-plus"></i> ${team.name}`;
+            btn.onclick = () => awardPoint(idx);
+            ui.scoringArea.appendChild(btn);
+        });
+        ui.scoringArea.classList.add('visible');
+    }
+
+    function awardPoint(teamIdx) {
+        teams[teamIdx].score++;
+        updateScoreboardUI();
+        saveState();
+        fireConfetti();
+        // Optional: Auto move next? No, let user control flow.
+    }
+
+    function updateScoreboardUI() {
+        ui.scoreboard.innerHTML = '';
+        // Sort for display logic if you wanted leader first, but static is better for UI stability.
+        // Let's keep order but highlight leader.
+        const maxScore = Math.max(...teams.map(t => t.score));
+
+        teams.forEach(team => {
+            const div = document.createElement('div');
+            div.className = 'team-badge';
+            if (team.score === maxScore && maxScore > 0) div.style.background = 'var(--accent-color)';
+            else div.style.background = 'var(--secondary-color)';
+            
+            // Color check for text contrast if needed, but keeping simple
+            if (team.score === maxScore && maxScore > 0) div.style.color = '#333';
+            
+            div.innerHTML = `<span class="small">${team.name}</span><span class="score">${team.score}</span>`;
+            div.title = team.players; // Tooltip shows players
+            ui.scoreboard.appendChild(div);
+        });
     }
 
     function nextQuestion() {
         if (currentQuestionIndex < questions.length - 1) {
             currentQuestionIndex++;
+            saveState();
             renderQuestion();
         } else {
             endGame();
         }
     }
-
+    
     function prevQuestion() {
         if (currentQuestionIndex > 0) {
             currentQuestionIndex--;
+            saveState();
             renderQuestion();
         }
+    }
+
+    function saveState() {
+        const state = { questions, teams, index: currentQuestionIndex };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
     function endGame() {
         switchScreen('end');
         fireConfetti(true);
+        localStorage.removeItem(STORAGE_KEY); // Clear state on finish
+
+        if (teams.length > 0) {
+            // Sort rankings
+            const ranked = [...teams].sort((a,b) => b.score - a.score);
+            ui.leaderboard.innerHTML = '';
+            
+            ranked.forEach((team, i) => {
+                const div = document.createElement('div');
+                div.className = 'leaderboard-item';
+                if (i === 0) div.classList.add('winner');
+                
+                let icon = i === 0 ? '👑' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : `#${i+1}`));
+                
+                div.innerHTML = `
+                    <div>
+                        <span class="me-3">${icon}</span>
+                        <strong>${team.name}</strong>
+                        <div class="small text-muted">${team.players}</div>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">${team.score} pts</span>
+                `;
+                ui.leaderboard.appendChild(div);
+            });
+        } else {
+            ui.leaderboard.innerHTML = '<p>Thanks for playing!</p>';
+        }
     }
 
     function resetGame() {
-        ui.fileInput.value = '';
+        ui.csvFile.value = '';
+        ui.teamFile.value = '';
+        ui.qLabel.textContent = 'No file chosen';
+        ui.tLabel.textContent = 'No file chosen';
         questions = [];
-        switchScreen('welcome'); // Go back to welcome screen on reset
+        teams = [];
+        localStorage.removeItem(STORAGE_KEY);
+        ui.restoreMsg.innerHTML = '';
+        switchScreen('welcome');
     }
 
-    function switchScreen(screenName) {
+    // --- Helpers ---
+    function switchScreen(name) {
         Object.values(screens).forEach(el => el.classList.add('d-none-custom'));
-        screens[screenName].classList.remove('d-none-custom');
+        screens[name].classList.remove('d-none-custom');
     }
-
+    
     function showError(msg) {
         ui.error.textContent = msg;
         ui.error.classList.remove('d-none-custom');
-    }
-
-    function downloadTemplate() {
-        const csvContent = "data:text/csv;charset=utf-8," 
-            + "Question,Answer\n"
-            + "Question 1,Answer 1\n"
-            + "Question 2,Answer 2";
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "trivia_template.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    function fireConfetti(isBig = false) {
-        const colors = themes[currentTheme].colors;
-        if (isBig) {
-            var duration = 3000;
-            var end = Date.now() + duration;
-            (function frame() {
-            confetti({ particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
-            confetti({ particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
-            if (Date.now() < end) requestAnimationFrame(frame);
-            }());
-        } else {
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: colors });
-        }
-    }
-
-    // --- Snow Effect ---
-    function createSnowflake() {
-        const snowflake = document.createElement('div');
-        snowflake.innerHTML = '❄';
-        snowflake.classList.add('snowflake');
-        snowflake.style.left = Math.random() * 100 + 'vw';
-        snowflake.style.animationDuration = Math.random() * 3 + 5 + 's';
-        snowflake.style.opacity = Math.random();
-        snowflake.style.fontSize = Math.random() * 20 + 10 + 'px';
-        document.body.appendChild(snowflake);
-        
-        setTimeout(() => { snowflake.remove(); }, 8000);
-    }
-
-    function startSnow() {
-        if (!snowInterval) {
-            snowInterval = setInterval(createSnowflake, 300);
-        }
-    }
-
-    function stopSnow() {
-        if (snowInterval) {
-            clearInterval(snowInterval);
-            snowInterval = null;
-        }
-        document.querySelectorAll('.snowflake').forEach(el => el.remove());
-    }
-
-    // Initialize
-    // Set initial music source, but don't play until user interacts
-    if(themes.christmas.music) {
-        ui.audio.src = themes.christmas.music;
-        ui.musicBtn.classList.remove('d-none-custom');
-        updateMusicBtnUI();
+        setTimeout(() => ui.error.classList.add('d-none-custom'), 5000);
     }
     
-    // START ON WELCOME SCREEN
-    switchScreen('welcome');
-    startSnow(); 
-</script>
+    function changeTheme(themeName) {
+        currentTheme = themeName;
+        document.body.setAttribute('data-theme', themeName);
+        const t = themes[themeName];
+        ui.themeIcon1.className = `fas ${t.icon} me-2`;
+        ui.themeIcon2.className = `fas ${t.icon2} ms-2`;
+        ui.endIcon.className = `fas ${t.endIcon} fa-4x mb-3`;
+        ui.themeTitle.textContent = themeName === 'diwali' ? 'Diwali Trivia' : themeName === 'holi' ? 'Holi Trivia' : themeName === 'newyear' ? 'New Year Trivia' : 'Holiday Trivia';
+        
+        if (t.snow) startSnow(); else stopSnow();
+        
+        if (t.music) {
+            ui.musicBtn.classList.remove('d-none-custom');
+            ui.audio.src = t.music;
+            if (isMusicPlaying) ui.audio.play().catch(() => {});
+        } else {
+            ui.musicBtn.classList.add('d-none-custom');
+            ui.audio.pause();
+        }
+    }
 
+    function toggleMusic() {
+        if (ui.audio.paused) {
+            ui.audio.play().then(() => { isMusicPlaying = true; updateMusicBtnUI(); }).catch(e => console.error(e));
+        } else {
+            ui.audio.pause();
+            isMusicPlaying = false;
+            updateMusicBtnUI();
+        }
+    }
+
+    function updateMusicBtnUI() {
+        ui.musicBtn.innerHTML = isMusicPlaying ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+        ui.musicBtn.classList.toggle('btn-light', !isMusicPlaying);
+        ui.musicBtn.classList.toggle('btn-success', isMusicPlaying);
+    }
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function fireConfetti(big = false) {
+        const c = themes[currentTheme].colors;
+        if (big) {
+            const end = Date.now() + 3000;
+            (function f() {
+                confetti({ particleCount: 7, angle: 60, spread: 55, origin: {x:0}, colors: c });
+                confetti({ particleCount: 7, angle: 120, spread: 55, origin: {x:1}, colors: c });
+                if (Date.now() < end) requestAnimationFrame(f);
+            })();
+        } else {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: c });
+        }
+    }
+
+    function createSnowflake() {
+        const s = document.createElement('div');
+        s.innerHTML = '❄';
+        s.className = 'snowflake';
+        s.style.left = Math.random()*100 + 'vw';
+        s.style.animationDuration = Math.random()*3 + 5 + 's';
+        s.style.opacity = Math.random();
+        s.style.fontSize = Math.random()*20 + 10 + 'px';
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 8000);
+    }
+
+    function startSnow() { if (!snowInterval) snowInterval = setInterval(createSnowflake, 300); }
+    function stopSnow() { clearInterval(snowInterval); snowInterval = null; document.querySelectorAll('.snowflake').forEach(e => e.remove()); }
+
+    function downloadTemplates() {
+        const qCSV = "data:text/csv;charset=utf-8,Question,Answer\nWhat is red?,A color\nWho is Santa?,St Nick";
+        const tCSV = "data:text/csv;charset=utf-8,Team Name,Players\nThe Rudolphs,John & Jane\nSnowmen,Bob & Alice";
+        
+        const link = document.createElement("a");
+        link.href = encodeURI(qCSV); link.download = "questions_template.csv"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        
+        setTimeout(() => {
+            const link2 = document.createElement("a");
+            link2.href = encodeURI(tCSV); link2.download = "teams_template.csv"; document.body.appendChild(link2); link2.click(); document.body.removeChild(link2);
+        }, 500);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (screens.game.classList.contains('d-none-custom')) return;
+        if (e.key === "ArrowRight" || e.key === " ") {
+            if(ui.answer.classList.contains('hidden')) toggleAnswer();
+            else nextQuestion();
+        }
+        if (e.key === "ArrowLeft") prevQuestion();
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") toggleAnswer();
+    });
+
+    init();
+</script>
 </body>
 </html>
