@@ -1,24 +1,26 @@
-🎄 Christmas Trivia Game
+🎄 Office Party Trivia Game
 
 A festive, browser-based trivia game designed for office parties and holiday gatherings. Built with Bootstrap and pure JavaScript, it runs entirely in the browser—no server setup required!
 
 ✨ Features
 
-CSV Upload: Load your own custom questions via a simple CSV file.
+🏆 Team Scoring System: Upload a list of teams, track scores live, and see a leaderboard at the end.
 
-Auto-Shuffle: Questions are automatically randomized every time you play.
+🎨 Multi-Theme Support: Switch between Christmas, New Year, Diwali, and Holi themes instantly.
 
-Interactive UI: Click to reveal answers, show/hide mechanics.
+🎵 Background Music: Plays festive tunes (defaults to Christmas) with a toggle button.
 
-Visual Effects: Falling snow animation and confetti celebrations for correct answers.
+💾 Auto-Save: Accidentally refreshed the page? The game remembers your progress and scores!
 
-Keyboard Controls: easy navigation for presenters.
+📂 CSV Upload: Load your own custom questions and teams via simple CSV files.
 
-Responsive: Works on laptops, tablets, and mobile devices (great for casting to a TV).
+❄️ Visual Effects: Falling snow/confetti animations and sound effects.
+
+⌨️ Keyboard Controls: Easy navigation for presenters.
 
 🚀 How to Host on GitHub Pages
 
-Upload index.html and your trivia_questions.csv to this repository.
+Upload index.html, bgmusic.mp3 (optional), and your CSV files to a GitHub repository.
 
 Go to Settings > Pages.
 
@@ -28,19 +30,23 @@ Visit your site at: https://<your-username>.github.io/<repo-name>/
 
 🎮 How to Play
 
-Open the website link.
+Welcome Screen: Click "Let's Play" to start the music and enter setup.
 
-Upload Questions: Drag and drop your .csv file into the box or click to select it.
+Upload Files:
+
+Questions (Required): Upload your trivia questions CSV.
+
+Teams (Optional): Upload your teams CSV. If skipped, the game runs in "Presentation Mode" without scoring.
 
 Gameplay:
 
-The question appears on the screen.
-
 Press Spacebar or Right Arrow to reveal the answer.
+
+Award Points: If teams are loaded, buttons will appear. Click the team name that answered correctly to give them a point.
 
 Press Right Arrow again to move to the next question.
 
-Celebrate with confetti! 🎉
+Winner: At the end, a podium leaderboard will display the winners!
 
 Keyboard Shortcuts
 
@@ -50,9 +56,11 @@ Space / →: Reveal Answer / Next Question
 
 ↑ / ↓: Toggle Answer Visibility
 
-📝 CSV Format
+📝 CSV Formats
 
-Create a simple Excel or Google Sheet and save it as .csv. It needs two columns:
+You can create these in Excel or Google Sheets and save as .csv.
+
+1. Questions File (trivia_questions.csv)
 
 Question
 
@@ -66,12 +74,31 @@ Where does the Grinch live?
 
 Mount Crumpit
 
-Example file content:
+2. Teams File (teams.csv)
 
-Question,Answer
-"What is the name of the snowman in Frozen?","Olaf"
-"What date is Christmas?","December 25th"
+Team Name
 
+Players
+
+The Rudolphs
+
+John, Jane, Bob
+
+The Snowmen
+
+Alice, Mike
+
+Team Tinsel
+
+Sarah, Dave
+
+🎵 Adding Music
+
+To use your own music for the Christmas theme:
+
+Rename your audio file to bgmusic.mp3.
+
+Place it in the same folder as index.html.
 
 🛠️ Built With
 
