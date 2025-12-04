@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Christmas Trivia</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --christmas-red: #D42426;
+            --christmas-green: #2F5233;
+            --christmas-gold: #F1D570;
+            --snow-white: #F8F9FA;
+        }
+
+        body {
+            background-color: var(--christmas-green);
+            background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-2.21 0-4-1.79-4-4 0-3.314-2.686-6-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6zM32 22c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-2.21 0-4-1.79-4-4 0-3.314-2.686-6-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6-2.21 0-4-1.79-4-4-3.314 0-6-2.686-6-6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 4px solid var(--christmas-gold);
+            min-height: 60vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .decorative-header {
+            background: var(--christmas-red);
+            color: var(--christmas-gold);
+            font-family: 'Mountains of Christmas', cursive;
+            padding: 15px;
+            text-align: center;
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        /* Garland effect */
+        .decorative-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: radial-gradient(circle, var(--christmas-gold) 6px, transparent 7px) repeat-x;
+            background-size: 30px 20px;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--christmas-green);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: rgba(47, 82, 51, 0.05);
+        }
+
+        .upload-area:hover {
+            background-color: rgba(47, 82, 51, 0.1);
+            border-color: var(--christmas-red);
+        }
+
+        .question-text {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--christmas-green);
+            margin-bottom: 2rem;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-box {
+            background-color: var(--christmas-red);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            transition: all 0.5s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .answer-box.hidden {
+            background-color: #e9ecef;
+            color: transparent;
+            position: relative;
+        }
+
+        .answer-box.hidden::after {
+            content: 'Click to Reveal Answer';
+            color: #6c757d;
+            position: absolute;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .btn-custom {
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s;
+        }
+
+        .btn-custom:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-next {
+            background-color: var(--christmas-green);
+            border: none;
+            color: white;
+        }
+
+        .btn-prev {
+            background-color: #6c757d;
+            border: none;
+            color: white;
+        }
+
+        .progress-bar-container {
+            height: 10px;
+            background-color: #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--christmas-red);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            animation: fall linear forwards;
+            z-index: 1;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+
+        /* Hidden class helper */
+        .d-none-custom {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            
+            <div class="main-card">
+                <div class="decorative-header">
+                    <i class="fas fa-holly-berry me-2"></i> Micron Holiday Trivia <i class="fas fa-gift ms-2"></i>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- ERROR MESSAGE -->
+                    <div id="error-message" class="alert alert-danger d-none-custom" role="alert"></div>
+
+                    <!-- SCREEN 1: UPLOAD -->
+                    <div id="setup-screen" class="text-center">
+                        <h3 class="mb-4" style="color: var(--christmas-green)">Let's Get This Party Started!</h3>
+                        <p class="text-muted mb-4">Upload your CSV file to begin. <br>Format: Column 1 = Question, Column 2 = Answer.</p>
+                        
+                        <div class="upload-area mb-4" id="drop-zone">
+                            <i class="fas fa-file-csv fa-4x mb-3" style="color: var(--christmas-green)"></i>
+                            <h5>Click to Upload CSV</h5>
+                            <p class="text-muted small">or drag and drop file here</p>
+                            <input type="file" id="csvFile" accept=".csv" class="d-none">
+                        </div>
+
+                        <div class="form-check d-inline-block mb-4">
+                            <input class="form-check-input" type="checkbox" value="" id="skipHeader">
+                            <label class="form-check-label" for="skipHeader">
+                                First row is a header (skip it)
+                            </label>
+                        </div>
+
+                        <div class="mt-3">
+                            <small class="text-muted d-block">Need a template?</small>
+                            <button class="btn btn-sm btn-outline-secondary mt-1" onclick="downloadTemplate()">Download Sample CSV</button>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 2: GAME -->
+                    <div id="game-screen" class="d-none-custom text-center">
+                        <div class="d-flex justify-content-between text-muted mb-2">
+                            <span id="question-counter">Question 1 of 10</span>
+                            <span id="score-display">Use arrow keys to navigate</span>
+                        </div>
+                        
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" id="progress-bar"></div>
+                        </div>
+
+                        <div class="question-text" id="question-display">
+                            Loading Question...
+                        </div>
+
+                        <div class="answer-box hidden" id="answer-display" onclick="toggleAnswer()">
+                            The Answer will appear here
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <button class="btn btn-custom btn-prev" onclick="prevQuestion()">
+                                <i class="fas fa-arrow-left me-2"></i> Prev
+                            </button>
+                            
+                            <button class="btn btn-outline-warning btn-custom" onclick="toggleAnswer()">
+                                <i class="fas fa-eye me-2"></i> Show/Hide Answer
+                            </button>
+
+                            <button class="btn btn-custom btn-next" onclick="nextQuestion()">
+                                Next <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 3: END -->
+                    <div id="end-screen" class="d-none-custom text-center py-5">
+                        <i class="fas fa-sleigh fa-5x mb-4" style="color: var(--christmas-red)"></i>
+                        <h2 class="display-4 mb-3" style="font-family: 'Mountains of Christmas', cursive;">That's a Wrap!</h2>
+                        <p class="lead mb-5">Hope you had a jolly good time.</p>
+                        
+                        <button class="btn btn-custom btn-next" onclick="resetGame()">
+                            <i class="fas fa-redo me-2"></i> Play Again
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<!-- PapaParse for CSV Parsing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<!-- Canvas Confetti for effects -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+    // --- State Management ---
+    let questions = [];
+    let currentQuestionIndex = 0;
+    
+    // --- DOM Elements ---
+    const screens = {
+        setup: document.getElementById('setup-screen'),
+        game: document.getElementById('game-screen'),
+        end: document.getElementById('end-screen')
+    };
+    
+    const ui = {
+        question: document.getElementById('question-display'),
+        answer: document.getElementById('answer-display'),
+        counter: document.getElementById('question-counter'),
+        progress: document.getElementById('progress-bar'),
+        fileInput: document.getElementById('csvFile'),
+        dropZone: document.getElementById('drop-zone'),
+        skipHeader: document.getElementById('skipHeader'),
+        error: document.getElementById('error-message')
+    };
+
+    // --- Event Listeners ---
+    
+    // File Input Trigger
+    ui.dropZone.addEventListener('click', () => ui.fileInput.click());
+
+    // Drag and Drop styling
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        ui.dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        ui.dropZone.addEventListener(eventName, () => {
+            ui.dropZone.style.backgroundColor = "rgba(47, 82, 51, 0.2)";
+            ui.dropZone.style.borderColor = "var(--christmas-red)";
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        ui.dropZone.addEventListener(eventName, () => {
+            ui.dropZone.style.backgroundColor = "";
+            ui.dropZone.style.borderColor = "";
+        }, false);
+    });
+
+    // File Handling
+    ui.dropZone.addEventListener('drop', handleDrop, false);
+    ui.fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]), false);
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+        if (screens.game.classList.contains('d-none-custom')) return;
+
+        if (e.key === "ArrowRight" || e.key === " ") {
+            // If answer is hidden, show it first. If shown, go next.
+            if(ui.answer.classList.contains('hidden')) {
+                toggleAnswer();
+            } else {
+                nextQuestion();
+            }
+        } else if (e.key === "ArrowLeft") {
+            prevQuestion();
+        } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            toggleAnswer();
+        }
+    });
+
+    // --- Logic ---
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        handleFile(files[0]);
+    }
+
+    function handleFile(file) {
+        if (!file) return;
+        
+        // Reset Error
+        ui.error.classList.add('d-none-custom');
+
+        if (file.type && !file.type.includes('csv') && !file.name.endsWith('.csv')) {
+            showError("Please upload a valid CSV file.");
+            return;
+        }
+
+        Papa.parse(file, {
+            complete: function(results) {
+                processData(results.data);
+            },
+            error: function(err) {
+                showError("Error parsing CSV: " + err.message);
+            }
+        });
+    }
+
+    function processData(data) {
+        // Filter empty rows
+        let cleanData = data.filter(row => row.length >= 2 && row[0] !== "" && row[0] !== null);
+
+        if (ui.skipHeader.checked) {
+            cleanData.shift();
+        }
+
+        if (cleanData.length === 0) {
+            showError("No questions found! Check your CSV format.");
+            return;
+        }
+
+        questions = cleanData.map(row => {
+            return {
+                q: row[0],
+                a: row[1]
+            };
+        });
+
+        startGame();
+    }
+
+    function startGame() {
+        currentQuestionIndex = 0;
+        switchScreen('game');
+        renderQuestion();
+        createSnowflakes();
+    }
+
+    function renderQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            endGame();
+            return;
+        }
+
+        const q = questions[currentQuestionIndex];
+        
+        // Fade effect
+        ui.question.style.opacity = 0;
+        
+        setTimeout(() => {
+            ui.question.textContent = q.q;
+            ui.answer.textContent = q.a;
+            ui.answer.classList.add('hidden'); // Always hide answer on new question
+            
+            ui.counter.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            
+            // Update progress
+            const percentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+            ui.progress.style.width = `${percentage}%`;
+
+            ui.question.style.opacity = 1;
+        }, 200);
+    }
+
+    function toggleAnswer() {
+        if (ui.answer.classList.contains('hidden')) {
+            ui.answer.classList.remove('hidden');
+            fireConfetti();
+        } else {
+            ui.answer.classList.add('hidden');
+        }
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            renderQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            renderQuestion();
+        }
+    }
+
+    function endGame() {
+        switchScreen('end');
+        fireConfetti(true); // Big confetti
+    }
+
+    function resetGame() {
+        ui.fileInput.value = '';
+        questions = [];
+        switchScreen('setup');
+    }
+
+    function switchScreen(screenName) {
+        Object.values(screens).forEach(el => el.classList.add('d-none-custom'));
+        screens[screenName].classList.remove('d-none-custom');
+    }
+
+    function showError(msg) {
+        ui.error.textContent = msg;
+        ui.error.classList.remove('d-none-custom');
+    }
+
+    // --- Helpers ---
+
+    function downloadTemplate() {
+        const csvContent = "data:text/csv;charset=utf-8," 
+            + "Question,Answer\n"
+            + "What is the name of the snowman in Frozen?,Olaf\n"
+            + "What date is Christmas?,December 25th\n"
+            + "Who stole Christmas?,The Grinch";
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "trivia_template.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function fireConfetti(isBig = false) {
+        if (isBig) {
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+            confetti({
+                particleCount: 7,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#D42426', '#2F5233', '#F1D570']
+            });
+            confetti({
+                particleCount: 7,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#D42426', '#2F5233', '#F1D570']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+            }());
+        } else {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#D42426', '#2F5233', '#F1D570']
+            });
+        }
+    }
+
+    function createSnowflakes() {
+        const count = 20;
+        for (let i = 0; i < count; i++) {
+            const snowflake = document.createElement('div');
+            snowflake.innerHTML = '❄';
+            snowflake.classList.add('snowflake');
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.animationDuration = Math.random() * 3 + 5 + 's';
+            snowflake.style.opacity = Math.random();
+            snowflake.style.fontSize = Math.random() * 20 + 10 + 'px';
+            document.body.appendChild(snowflake);
+        }
+    }
+</script>
+
+</body>
+</html>
