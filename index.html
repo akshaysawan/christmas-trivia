@@ -33,7 +33,6 @@
             --text-on-primary: #FFD700;
             --bg-color: #1a1a1a;
             --header-font: 'Cinzel', serif;
-            /* Geometric Art Deco Pattern */
             --bg-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23FFD700' fill-opacity='0.1'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
@@ -44,7 +43,6 @@
             --text-on-primary: #fff;
             --bg-color: #311B92;            /* Indigo */
             --header-font: 'Poppins', sans-serif; 
-            /* Mandala-ish Pattern */
             --bg-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFD600' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
@@ -55,7 +53,6 @@
             --text-on-primary: #fff;
             --bg-color: #E91E63;
             --header-font: 'Pacifico', cursive;
-            /* Splatter-ish dots */
             --bg-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         }
 
@@ -76,10 +73,12 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             border: 4px solid var(--accent-color);
-            min-height: 60vh;
+            min-height: 80vh; /* Increased height for splitscreen */
             position: relative;
             overflow: hidden;
             transition: border-color 0.5s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .decorative-header {
@@ -91,6 +90,7 @@
             font-size: 2.5rem;
             position: relative;
             transition: all 0.5s ease;
+            flex-shrink: 0;
         }
 
         .decorative-header::after {
@@ -102,6 +102,13 @@
             height: 20px;
             background: radial-gradient(circle, var(--accent-color) 6px, transparent 7px) repeat-x;
             background-size: 30px 20px;
+        }
+
+        .card-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .top-controls {
@@ -220,36 +227,74 @@
             pointer-events: none;
         }
 
-        /* Scoreboard Styles */
-        .scoreboard {
-            background: rgba(255,255,255,0.9);
-            border-radius: 15px;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 2px solid var(--accent-color);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .team-badge {
-            background: var(--secondary-color);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
+        /* --- SIDEBAR SCOREBOARD STYLES --- */
+        .sidebar-container {
+            border-left: 2px solid #eee;
+            padding-left: 20px;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-width: 100px;
         }
 
-        .team-badge .score {
+        .sidebar-title {
+            font-family: var(--header-font);
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .team-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .team-card.leader {
+            border: 2px solid var(--accent-color);
+            background-color: rgba(241, 213, 112, 0.1); /* light gold bg */
+        }
+
+        .team-card.leader::after {
+            content: '👑';
+            position: absolute;
+            top: -10px;
+            right: -5px;
             font-size: 1.2rem;
-            color: #000;
         }
 
+        .team-name {
+            font-weight: bold;
+            color: var(--secondary-color);
+            display: block;
+        }
+
+        .team-players {
+            font-size: 0.8rem;
+            color: #777;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .team-score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Adjust scoring buttons */
         .scoring-controls {
             display: flex;
             justify-content: center;
@@ -288,6 +333,17 @@
         }
 
         .d-none-custom { display: none !important; }
+        
+        /* Mobile adjustment for sidebar */
+        @media (max-width: 768px) {
+            .sidebar-container {
+                border-left: none;
+                border-top: 2px solid #eee;
+                padding-left: 0;
+                padding-top: 20px;
+                margin-top: 20px;
+            }
+        }
     </style>
 </head>
 <body data-theme="christmas">
@@ -308,9 +364,9 @@
     </select>
 </div>
 
-<div class="container">
+<div class="container-fluid px-lg-5"> <!-- Wider Container -->
     <div class="row justify-content-center">
-        <div class="col-lg-10">
+        <div class="col-xl-10 col-lg-12">
             
             <div class="main-card">
                 <div class="decorative-header">
@@ -319,12 +375,12 @@
                     <i id="theme-icon-2" class="fas fa-gift ms-2"></i>
                 </div>
 
-                <div class="card-body p-4 p-md-5">
+                <div class="card-body p-4">
                     
                     <div id="error-message" class="alert alert-danger d-none-custom" role="alert"></div>
 
                     <!-- WELCOME -->
-                    <div id="welcome-screen" class="text-center py-4">
+                    <div id="welcome-screen" class="text-center py-4 flex-grow-1 d-flex flex-column justify-content-center">
                         <div class="mb-4">
                              <i class="fas fa-glass-cheers fa-3x" style="color: var(--accent-color); opacity: 0.5"></i>
                         </div>
@@ -342,11 +398,11 @@
                     </div>
 
                     <!-- SETUP -->
-                    <div id="setup-screen" class="text-center d-none-custom">
+                    <div id="setup-screen" class="text-center d-none-custom flex-grow-1">
                         <h3 class="mb-4" style="color: var(--secondary-color)">Game Setup</h3>
                         
-                        <div class="row g-3">
-                            <div class="col-md-6">
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-5">
                                 <div class="upload-area h-100" id="drop-zone-q">
                                     <i class="fas fa-question-circle fa-2x mb-2" style="color: var(--secondary-color)"></i>
                                     <h6>1. Upload Questions (CSV)</h6>
@@ -355,7 +411,7 @@
                                     <input type="file" id="csvFile" accept=".csv" class="d-none">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <div class="upload-area h-100" id="drop-zone-t">
                                     <i class="fas fa-users fa-2x mb-2" style="color: var(--secondary-color)"></i>
                                     <h6>2. Upload Teams (CSV)</h6>
@@ -375,52 +431,78 @@
                              <button class="btn btn-lg btn-custom btn-next" onclick="processAllFiles()">Start Game</button>
                         </div>
 
-                        <div class="mt-3">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="downloadTemplates()">Download Templates</button>
+                        <div class="mt-4">
+                            <p class="text-muted small mb-2">Download Game Files:</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="questions.csv" download class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-download me-1"></i> questions.csv
+                                </a>
+                                <a href="TeamNames.csv" download class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-download me-1"></i> TeamNames.csv
+                                </a>
+                            </div>
+                             <div class="mt-2">
+                                <button class="btn btn-sm btn-link text-muted" onclick="downloadTemplates()" style="text-decoration: none; font-size: 0.8rem;">
+                                    (Or generate sample templates)
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- GAME -->
-                    <div id="game-screen" class="d-none-custom text-center">
-                        <!-- Scoreboard Area -->
-                        <div id="scoreboard-container" class="scoreboard d-none-custom">
-                            <!-- Teams injected here -->
-                        </div>
+                    <!-- GAME (SPLIT LAYOUT) -->
+                    <div id="game-screen" class="d-none-custom flex-grow-1">
+                        <div class="row h-100">
+                            <!-- LEFT: GAME AREA -->
+                            <div class="col-md-9 d-flex flex-column">
+                                <div class="d-flex justify-content-between text-muted mb-2">
+                                    <span id="question-counter">Question 1 of 10</span>
+                                    <span id="score-display">Use arrow keys to navigate</span>
+                                </div>
+                                
+                                <div class="progress-bar-container">
+                                    <div class="progress-fill" id="progress-bar"></div>
+                                </div>
 
-                        <div class="d-flex justify-content-between text-muted mb-2">
-                            <span id="question-counter">Question 1 of 10</span>
-                            <span id="score-display">Use arrow keys to navigate</span>
-                        </div>
-                        
-                        <div class="progress-bar-container">
-                            <div class="progress-fill" id="progress-bar"></div>
-                        </div>
+                                <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                    <div class="question-text" id="question-display">Loading...</div>
 
-                        <div class="question-text" id="question-display">Loading...</div>
+                                    <div class="answer-box hidden" id="answer-display" onclick="toggleAnswer()">
+                                        Answer
+                                    </div>
 
-                        <div class="answer-box hidden" id="answer-display" onclick="toggleAnswer()">
-                            Answer
-                        </div>
+                                    <!-- Scoring Buttons appear here -->
+                                    <div id="scoring-area" class="scoring-controls">
+                                        <span class="text-muted w-100 mb-2">Who got it right?</span>
+                                        <!-- Buttons injected here -->
+                                    </div>
+                                </div>
 
-                        <!-- Scoring Buttons appear here -->
-                        <div id="scoring-area" class="scoring-controls">
-                            <span class="text-muted w-100 mb-2">Who got it right?</span>
-                            <!-- Buttons injected here -->
-                        </div>
+                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                    <button class="btn btn-custom btn-prev" onclick="prevQuestion()"><i class="fas fa-arrow-left"></i></button>
+                                    <button class="btn btn-outline-warning btn-custom" onclick="toggleAnswer()"><i class="fas fa-eye"></i> Show</button>
+                                    <button class="btn btn-custom btn-next" onclick="nextQuestion()">Next <i class="fas fa-arrow-right"></i></button>
+                                </div>
+                            </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <button class="btn btn-custom btn-prev" onclick="prevQuestion()"><i class="fas fa-arrow-left"></i></button>
-                            <button class="btn btn-outline-warning btn-custom" onclick="toggleAnswer()"><i class="fas fa-eye"></i> Show</button>
-                            <button class="btn btn-custom btn-next" onclick="nextQuestion()">Next <i class="fas fa-arrow-right"></i></button>
+                            <!-- RIGHT: SIDEBAR SCOREBOARD -->
+                            <div class="col-md-3">
+                                <div class="sidebar-container">
+                                    <div class="sidebar-title">Leaderboard</div>
+                                    <div id="sidebar-list" style="overflow-y: auto; max-height: 60vh;">
+                                        <!-- Team Cards injected here -->
+                                        <div class="text-muted text-center small mt-4">No teams loaded</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- END -->
-                    <div id="end-screen" class="d-none-custom text-center py-4">
+                    <div id="end-screen" class="d-none-custom text-center py-4 flex-grow-1 d-flex flex-column justify-content-center">
                         <i id="end-icon" class="fas fa-trophy fa-4x mb-3" style="color: var(--accent-color)"></i>
                         <h2 class="display-4 mb-3" style="font-family: var(--header-font);">Final Scores!</h2>
                         
-                        <div id="final-leaderboard" class="text-start mx-auto" style="max-width: 500px;">
+                        <div id="final-leaderboard" class="text-start mx-auto w-100" style="max-width: 500px;">
                             <!-- Leaderboard injected here -->
                         </div>
                         
@@ -477,8 +559,8 @@
         musicBtn: document.getElementById('music-btn'),
         qLabel: document.getElementById('q-file-label'),
         tLabel: document.getElementById('t-file-label'),
-        scoreboard: document.getElementById('scoreboard-container'),
         scoringArea: document.getElementById('scoring-area'),
+        sidebarList: document.getElementById('sidebar-list'),
         leaderboard: document.getElementById('final-leaderboard'),
         restoreMsg: document.getElementById('restore-msg')
     };
@@ -494,7 +576,6 @@
     // --- Logic ---
 
     function init() {
-        // Check for saved state
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             ui.restoreMsg.innerHTML = '<button class="btn btn-sm btn-link" onclick="restoreGame()">Resume previous game?</button>';
@@ -517,12 +598,9 @@
     }
 
     // --- File Handling ---
-
-    // Click triggers
     document.getElementById('drop-zone-q').onclick = () => ui.csvFile.click();
     document.getElementById('drop-zone-t').onclick = () => ui.teamFile.click();
 
-    // File selection listeners
     ui.csvFile.onchange = (e) => ui.qLabel.textContent = e.target.files[0]?.name || "No file chosen";
     ui.teamFile.onchange = (e) => ui.tLabel.textContent = e.target.files[0]?.name || "No file chosen";
 
@@ -535,7 +613,6 @@
             return;
         }
 
-        // Parse Questions first
         Papa.parse(qFile, {
             complete: (resQ) => {
                 const qData = processCSV(resQ.data);
@@ -543,7 +620,6 @@
                 
                 questions = shuffleArray(qData.map(r => ({q: r[0], a: r[1]})));
 
-                // If Teams file exists, parse it
                 if (tFile) {
                     Papa.parse(tFile, {
                         complete: (resT) => {
@@ -553,7 +629,7 @@
                         }
                     });
                 } else {
-                    teams = []; // No scoring mode
+                    teams = [];
                     startGame();
                 }
             },
@@ -588,12 +664,11 @@
     function renderGame() {
         switchScreen('game');
         
-        // Setup Scoreboard if teams exist
+        // Setup Scoreboard Side bar
         if (teams.length > 0) {
-            ui.scoreboard.classList.remove('d-none-custom');
-            updateScoreboardUI();
+            updateSidebarUI();
         } else {
-            ui.scoreboard.classList.add('d-none-custom');
+            ui.sidebarList.innerHTML = '<div class="text-muted text-center small mt-4">No scoring</div>';
         }
 
         renderQuestion();
@@ -611,9 +686,7 @@
             ui.question.textContent = q.q;
             ui.answer.textContent = q.a;
             ui.answer.classList.add('hidden');
-            ui.scoringArea.classList.remove('visible'); // Hide scoring buttons
-            
-            // Clear scoring area
+            ui.scoringArea.classList.remove('visible'); 
             ui.scoringArea.innerHTML = ''; 
 
             ui.counter.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
@@ -628,7 +701,6 @@
             ui.answer.classList.remove('hidden');
             fireConfetti();
             
-            // Show scoring buttons if teams exist
             if (teams.length > 0) {
                 renderScoringButtons();
             }
@@ -652,30 +724,33 @@
 
     function awardPoint(teamIdx) {
         teams[teamIdx].score++;
-        updateScoreboardUI();
+        updateSidebarUI();
         saveState();
         fireConfetti();
-        // Optional: Auto move next? No, let user control flow.
     }
 
-    function updateScoreboardUI() {
-        ui.scoreboard.innerHTML = '';
-        // Sort for display logic if you wanted leader first, but static is better for UI stability.
-        // Let's keep order but highlight leader.
+    function updateSidebarUI() {
+        ui.sidebarList.innerHTML = '';
         const maxScore = Math.max(...teams.map(t => t.score));
+        
+        // Clone and sort teams for display (Highest score first)
+        const sortedTeams = [...teams].sort((a,b) => b.score - a.score);
 
-        teams.forEach(team => {
+        sortedTeams.forEach(team => {
             const div = document.createElement('div');
-            div.className = 'team-badge';
-            if (team.score === maxScore && maxScore > 0) div.style.background = 'var(--accent-color)';
-            else div.style.background = 'var(--secondary-color)';
+            div.className = 'team-card';
             
-            // Color check for text contrast if needed, but keeping simple
-            if (team.score === maxScore && maxScore > 0) div.style.color = '#333';
+            // Leader highlight
+            if (team.score === maxScore && maxScore > 0) {
+                div.classList.add('leader');
+            }
             
-            div.innerHTML = `<span class="small">${team.name}</span><span class="score">${team.score}</span>`;
-            div.title = team.players; // Tooltip shows players
-            ui.scoreboard.appendChild(div);
+            div.innerHTML = `
+                <span class="team-name">${team.name}</span>
+                <span class="team-players">${team.players}</span>
+                <span class="team-score">${team.score}</span>
+            `;
+            ui.sidebarList.appendChild(div);
         });
     }
 
@@ -705,10 +780,9 @@
     function endGame() {
         switchScreen('end');
         fireConfetti(true);
-        localStorage.removeItem(STORAGE_KEY); // Clear state on finish
+        localStorage.removeItem(STORAGE_KEY); 
 
         if (teams.length > 0) {
-            // Sort rankings
             const ranked = [...teams].sort((a,b) => b.score - a.score);
             ui.leaderboard.innerHTML = '';
             
