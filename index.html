@@ -398,7 +398,12 @@
 </audio>
 
 <div class="top-controls">
-    <button class="btn btn-sm btn-light shadow-sm d-none-custom" id="music-btn" onclick="toggleMusic()">
+    <!-- SFX Button -->
+    <button class="btn btn-sm btn-light shadow-sm" id="sfx-btn" onclick="toggleSFX()" title="Toggle Sound Effects">
+        <i class="fas fa-volume-up"></i>
+    </button>
+    <!-- Music Button -->
+    <button class="btn btn-sm btn-light shadow-sm d-none-custom" id="music-btn" onclick="toggleMusic()" title="Toggle Music">
         <i class="fas fa-music"></i>
     </button>
     <select class="form-select form-select-sm shadow-sm" style="width: auto;" id="themeSelect" onchange="changeTheme(this.value)">
@@ -580,17 +585,21 @@
 <script>
     // --- State ---
     let questions = [];
-    let teams = []; // { name: "Team A", players: "John, Doe", score: 0 }
+    let teams = []; 
     let currentQuestionIndex = 0;
     let currentTheme = 'christmas';
     let snowInterval;
     let isMusicPlaying = false;
+    let isSFXEnabled = true;
     
     // Timer State
     let timerInterval = null;
     let timeLeft = 30;
     let isTimerRunning = false;
     
+    // Audio Context for SFX
+    let audioCtx = null;
+
     const STORAGE_KEY = 'trivia_game_state';
 
     // --- DOM ---
@@ -616,13 +625,13 @@
         themeTitle: document.getElementById('theme-title'),
         audio: document.getElementById('bg-music'),
         musicBtn: document.getElementById('music-btn'),
+        sfxBtn: document.getElementById('sfx-btn'),
         qLabel: document.getElementById('q-file-label'),
         tLabel: document.getElementById('t-file-label'),
         scoringArea: document.getElementById('scoring-area'),
         sidebarList: document.getElementById('sidebar-list'),
         leaderboard: document.getElementById('final-leaderboard'),
         restoreMsg: document.getElementById('restore-msg'),
-        // Timer UI
         timerText: document.getElementById('timer-text'),
         timerFill: document.getElementById('timer-fill')
     };
@@ -634,6 +643,74 @@
         diwali: { colors: ['#E65100', '#FFD600', '#4A148C'], icon: 'fa-fire', icon2: 'fa-om', endIcon: 'fa-fire-alt', snow: false, music: null },
         holi: { colors: ['#E91E63', '#00BCD4', '#FFEB3B', '#4CAF50'], icon: 'fa-palette', icon2: 'fa-hand-sparkles', endIcon: 'fa-smile-beam', snow: false, music: null }
     };
+
+    // --- Sound Manager (Web Audio API) ---
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playSound(type) {
+        if (!isSFXEnabled || !audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        
+        if (type === 'reveal') {
+            // Chime: C5 -> E5 -> G5
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.1);
+            osc.frequency.setValueAtTime(783.99, now + 0.2);
+            
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+            
+            osc.start(now);
+            osc.stop(now + 0.6);
+        } else if (type === 'point') {
+            // Coin: High B -> High E
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(987.77, now);
+            osc.frequency.setValueAtTime(1318.51, now + 0.08);
+            
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+            
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'timeup') {
+            // Buzzer: Sawtooth drop
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+            
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+            
+            osc.start(now);
+            osc.stop(now + 0.4);
+        }
+    }
+
+    function toggleSFX() {
+        isSFXEnabled = !isSFXEnabled;
+        ui.sfxBtn.innerHTML = isSFXEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+        ui.sfxBtn.classList.toggle('btn-light', !isSFXEnabled);
+        ui.sfxBtn.classList.toggle('btn-success', isSFXEnabled);
+        
+        // Initialize context on first interaction if needed
+        if(isSFXEnabled) initAudio();
+    }
 
     // --- Logic ---
 
@@ -648,6 +725,7 @@
     }
 
     function enterSetup() {
+        initAudio(); // Initialize Web Audio API on first user click
         playMusicSafe();
         switchScreen('setup');
     }
@@ -720,13 +798,13 @@
             currentQuestionIndex = saved.index;
             renderGame();
             playMusicSafe();
+            initAudio(); // Ensure audio ctx is ready
         }
     }
 
     function renderGame() {
         switchScreen('game');
         
-        // Setup Scoreboard Side bar
         if (teams.length > 0) {
             updateSidebarUI();
         } else {
@@ -755,7 +833,7 @@
             ui.progress.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
             ui.question.style.opacity = 1;
 
-            startTimer(); // START TIMER
+            startTimer(); 
         }, 200);
     }
 
@@ -764,7 +842,8 @@
         if (isHidden) {
             ui.answer.classList.remove('hidden');
             fireConfetti();
-            stopTimer(); // STOP TIMER
+            playSound('reveal'); // Play Reveal Sound
+            stopTimer();
             
             if (teams.length > 0) {
                 renderScoringButtons();
@@ -788,6 +867,7 @@
                 updateTimerUI();
             } else {
                 stopTimer();
+                playSound('timeup'); // Play Time Up Sound
             }
         }, 1000);
     }
@@ -808,6 +888,7 @@
                     updateTimerUI();
                 } else {
                     stopTimer();
+                    playSound('timeup');
                 }
             }, 1000);
         }
@@ -838,6 +919,7 @@
 
     function awardPoint(teamIdx) {
         teams[teamIdx].score++;
+        playSound('point'); // Play Point Sound
         updateSidebarUI();
         saveState();
         fireConfetti();
@@ -855,8 +937,6 @@
         ui.sidebarList.innerHTML = '';
         const maxScore = Math.max(...teams.map(t => t.score));
         
-        // Clone for sort, but we need original index for callbacks? 
-        // Better: map to include index, then sort.
         const indexedTeams = teams.map((t, i) => ({...t, originalIndex: i}));
         const sortedTeams = indexedTeams.sort((a,b) => b.score - a.score);
 
