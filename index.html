@@ -184,7 +184,7 @@
             
             <div class="main-card">
                 <div class="decorative-header">
-                    <i class="fas fa-holly-berry me-2"></i> Micron Holiday Trivia <i class="fas fa-gift ms-2"></i>
+                    <i class="fas fa-holly-berry me-2"></i> Holiday Trivia <i class="fas fa-gift ms-2"></i>
                 </div>
 
                 <div class="card-body p-4 p-md-5">
@@ -209,6 +209,11 @@
                             <label class="form-check-label" for="skipHeader">
                                 First row is a header (skip it)
                             </label>
+                        </div>
+                        
+                        <!-- Added Badge for Randomization -->
+                        <div class="mb-3">
+                            <span class="badge bg-success"><i class="fas fa-random me-1"></i> Auto-Shuffle Enabled</span>
                         </div>
 
                         <div class="mt-3">
@@ -378,6 +383,15 @@
         });
     }
 
+    // Fisher-Yates Shuffle Algorithm
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
     function processData(data) {
         // Filter empty rows
         let cleanData = data.filter(row => row.length >= 2 && row[0] !== "" && row[0] !== null);
@@ -391,12 +405,15 @@
             return;
         }
 
-        questions = cleanData.map(row => {
+        let rawQuestions = cleanData.map(row => {
             return {
                 q: row[0],
                 a: row[1]
             };
         });
+
+        // SHUFFLE THE QUESTIONS HERE
+        questions = shuffleArray(rawQuestions);
 
         startGame();
     }
